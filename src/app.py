@@ -11,19 +11,19 @@ from model import database, Download
 # the apps
 app = Flask(__name__)
 
-@app.route('/init')
+@app.route('/ws/init')
 def init():
   database.connect()
   database.create_tables([Download])
   return 'OK'
 
-@app.route('/list')
+@app.route('/ws/history')
 def list():
-  database.connect()
-  downloads = Download.select()
-  return jsonify({'rows':[model_to_dict(d) for d in downloads]})
+  downloader = Downloader(consts.DOWNLOAD_DIR)
+  downloads = Download.select().where((Download.status > consts.STATUS_PROCESSED) | (Download.status < 0)).order_by(Download.started_at.desc())
+  return jsonify({'items':[downloader.get_status(d) for d in downloads]})
 
-@app.route('/download')
+@app.route('/ws/download')
 def download():
 
   # for now
@@ -45,14 +45,14 @@ def download():
   # done
   return jsonify(model_to_dict(download))
 
-@app.route('/status')
+@app.route('/ws/status')
 def status_all():
 
   downloader = Downloader(consts.DOWNLOAD_DIR)
   downloads = Download.select().where((Download.status != consts.STATUS_PROCESSED) & (Download.status != consts.STATUS_CANCELLED)).order_by(Download.started_at.desc())
-  return jsonify({'rows':[downloader.get_status(d) for d in downloads]})
+  return jsonify({'items':[downloader.get_status(d) for d in downloads]})
 
-@app.route('/status/<id>')
+@app.route('/ws/status/<id>')
 def status_one(id):
 
   try:
@@ -63,7 +63,7 @@ def status_one(id):
   downloader = Downloader(consts.DOWNLOAD_DIR)
   return jsonify(downloader.get_status(download))
 
-@app.route('/start/<id>')
+@app.route('/ws/start/<id>')
 def start(id):
 
   try:
@@ -79,7 +79,7 @@ def start(id):
   # done
   return jsonify(model_to_dict(download))
 
-@app.route('/cancel/<id>')
+@app.route('/ws/cancel/<id>')
 def cancel(id):
 
   try:
@@ -92,3 +92,8 @@ def cancel(id):
     return jsonify({'status': 'ok'})
   else:
     abort(500)
+
+@app.route('/ws/purge/<id>')
+def purge(id):
+  Download.delete().where(Download.id == id).execute()
+  return jsonify({'status': 'ok'})

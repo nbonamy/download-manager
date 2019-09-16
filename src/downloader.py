@@ -108,7 +108,7 @@ class Downloader:
           dld.status = consts.STATUS_COMPLETED
           dld.save()
         else:
-          status['progress'] = round(currsize / dld.filesize * 100, 1)
+          status['progress'] = '{0:2.1f}'.format(currsize / dld.filesize * 100)
 
           # now check processs
           try:

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Download Manager</title>
+		<link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+		<link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
+    <link rel="stylesheet" href="css/index.css">
+		<script defer src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+		<script defer src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+		<script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script defer src="js/index.js"></script>
+  </head>
+  <body>
+		<div id="app">
+			<div class="fabtn has-background-success" @click="add()">
+				<i class="mdi mdi-plus"></i>
+			</div>
+			<section class="section">
+				<div class="container">
+					<table class="table">
+						<thead>
+							<th>URL</th>
+							<th>Filename</th>
+							<th>Status</th>
+							<th>Speed</th>
+							<th>Time Left</th>
+							<th>Actions</th>
+						</thead>
+						<tbody>
+							<tr v-for="item in downloads">
+								<td>{{ item.info.url }}</td>
+								<td>{{ item.info.filename }}</td>
+								<td>
+									<span v-if="item.status == 'downloading'" class="tabular-number">{{ item.progress }}%</span>
+									<span v-else>{{ item.status }}</span>
+								</td>
+								<td class="tabular-number">{{ item.speed }}</td>
+								<td class="tabular-number">{{ item.time_left }}</td>
+								<td>
+									<a href="#" @click="cancel(item)"	v-if="item.status == 'downloading'">
+										<span class="icon has-text-danger">
+											<i class="mdi mdi-stop-circle"></i>
+										</span>
+									</a>
+									<a href="#" @click="finalize(item)"	v-if="item.status == 'completed'">
+										<span class="icon has-text-info">
+											<i class="mdi mdi-chevron-double-right"></i>
+										</span>
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="container" v-if="history != null && history.length > 0">
+					<table class="table">
+						<thead>
+							<th>URL</th>
+							<th>Filename</th>
+							<th>Status</th>
+							<th>Actions</th>
+						</thead>
+						<tbody>
+							<tr v-for="item in history">
+								<td>{{ item.info.url }}</td>
+								<td>{{ item.info.filename }}</td>
+								<td>{{ item.status }}</td>
+								<td>
+									<a href="#" @click="purge(item)">
+										<span class="icon has-text-danger">
+											<i class="mdi mdi-delete"></i>
+										</span>
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+		</div>
+  </body>
+</html>
