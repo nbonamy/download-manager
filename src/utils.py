@@ -1,4 +1,5 @@
 import re
+import datetime
 from math import log2
 
 _suffixes = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
@@ -26,8 +27,14 @@ def extractTitle(filename):
   # scan
   for i in range(len(parts)):
     part = parts[i].lower()
-    if re.match(r'^[0-9][0-9][0-9][0-9]$', part):
-      lastDate = i
+    m = re.match(r'^([0-9][0-9][0-9][0-9])$', part) 
+    if m:
+      if lastDate == len(parts)-1:
+        year = int(m.groups(0)[0])
+        if year <= datetime.datetime.now().year + 5:
+          lastDate = i
+      else:
+        lastDate = i
     if part in ['multi', 'vo', 'vf', 'vost', 'vostfr', 'french', 'truefrench']:
       lastLang = i
     if part in ['sd','hd','bluray','720p','1080p','2160p','4k']:
