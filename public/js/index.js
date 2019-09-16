@@ -26,6 +26,7 @@ var vm = new Vue({
         title: 'Cancel download',
         message: 'Are you sure you want to <b>cancel</b> this download? This action cannot be undone.',
         confirmText: 'Cancel download',
+        cancelText: 'Keep it going',
         type: 'is-danger',
         hasIcon: true,
         onConfirm: () => {

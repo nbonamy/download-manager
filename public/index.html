@@ -61,14 +61,14 @@
 											<i class="mdi mdi-chevron-double-right"></i>
 										</span>
 									</a>
-									<a href="#" @click="purge(item)" v-if="item.status == 'completed'">
-										<span class="icon has-text-danger">
-											<i class="mdi mdi-delete"></i>
-										</span>
-									</a>
-									<a href="#" @click="start(item)" v-if="item.status == 'error'">
+									<a href="#" @click="start(item)" v-if="['created', 'error'].includes(item.status)">
 										<span class="icon has-text-primary">
 											<i class="mdi mdi-reload"></i>
+										</span>
+									</a>
+									<a href="#" @click="purge(item)" v-if="['error', 'completed'].includes(item.status)">
+										<span class="icon has-text-danger">
+											<i class="mdi mdi-delete"></i>
 										</span>
 									</a>
 								</td>
