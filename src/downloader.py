@@ -113,7 +113,11 @@ class Downloader:
 
           # now check processs
           try:
-            psutil.Process(dld.pid)
+            p = psutil.Process(dld.pid)
+            if p.status() in (psutil.STATUS_STOPPED, psutil.STATUS_ZOMBIE, psutil.STATUS_DEAD):
+              raise Exception()
+
+            # download in progress
             status['status'] = 'downloading'
 
             # calculate download speed
