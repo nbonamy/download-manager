@@ -76,6 +76,7 @@ class Downloader:
         p = subprocess.Popen(['/usr/local/bin/plowdown', '-q', dld.url, '&'], cwd=self.cwd, preexec_fn=os.setsid)
       dld.pid = p.pid
       dld.status = consts.STATUS_DOWNLOADING
+      dld.started_at = datetime.datetime.now()
       dld.save()
       return True
     except Exception as ex:
