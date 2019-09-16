@@ -3,6 +3,7 @@ import os.path
 import subprocess
 import consts
 import urllib.parse
+import utils
 from downloader import Downloader
 from playhouse.shortcuts import model_to_dict
 from flask import Flask, request, jsonify, abort
@@ -77,6 +78,56 @@ def status_one(id):
 
   downloader = Downloader(consts.DOWNLOAD_DIR)
   return jsonify(downloader.get_status(download))
+
+@app.route('/ws/title/<id>')
+def title(id):
+
+  try:
+    download = Download.get_by_id(id)
+  except:
+    abort(404)
+
+  return jsonify({'title': utils.extractTitle(download.filename)})
+
+@app.route('/ws/destinations')
+def destinations():
+
+  dirs = []
+  for dirname, dirnames, filenames in os.walk(consts.TARGET_DIR):
+
+    while True:
+      size = len(dirnames)
+      for subdirname in dirnames:
+        if subdirname[0] == '.' or subdirname[:2] == '__':
+          dirnames.remove(subdirname)
+          break
+      if size == len(dirnames):
+        break
+
+    #print(dirname)
+    for subdirname in dirnames:
+      dirs.append(os.path.join(dirname, subdirname))
+
+  return jsonify({'items': dirs})
+
+@app.route('/ws/finalize/<id>')
+def finalize(id):
+
+  # for now
+  dest = request.args.get('dest')
+  if len(dest) < 1:
+    abort(400)
+
+  try:
+    download = Download.get_by_id(id)
+  except:
+    abort(404)
+
+  downloader = Downloader(consts.DOWNLOAD_DIR)
+  if downloader.finalize(download, dest):
+    return jsonify({'status': 'ok'})
+  else:
+    abort(500)
 
 @app.route('/ws/cancel/<id>')
 def cancel(id):

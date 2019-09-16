@@ -4,6 +4,7 @@ TEST = 1
 
 #TODO
 DOWNLOAD_DIR = '~/Downloads'
+TARGET_DIR = '/home/nbonamy/src/download-manager/'
 
 # status
 STATUS_ERROR = -1
