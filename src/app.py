@@ -27,7 +27,7 @@ def status():
 @app.route('/ws/history')
 def list():
   downloader = Downloader(consts.DOWNLOAD_DIR)
-  downloads = Download.select().where((Download.status > consts.STATUS_PROCESSED) | (Download.status < 0)).order_by(Download.started_at.desc())
+  downloads = Download.select().where((Download.status >= consts.STATUS_PROCESSED) | (Download.status < 0)).order_by(Download.started_at.desc())
   return jsonify({'items':[downloader.get_status(d) for d in downloads]})
 
 @app.route('/ws/download')
@@ -113,9 +113,14 @@ def destinations():
 @app.route('/ws/finalize/<id>')
 def finalize(id):
 
-  # for now
+  # check title
+  title = request.args.get('title')
+  if title is None or len(title) < 1:
+    abort(400)
+
+  # check destination
   dest = request.args.get('dest')
-  if len(dest) < 1:
+  if dest is None or len(dest) < 1:
     abort(400)
 
   try:
@@ -124,7 +129,7 @@ def finalize(id):
     abort(404)
 
   downloader = Downloader(consts.DOWNLOAD_DIR)
-  if downloader.finalize(download, dest):
+  if downloader.finalize(download, dest, title):
     return jsonify({'status': 'ok'})
   else:
     abort(500)

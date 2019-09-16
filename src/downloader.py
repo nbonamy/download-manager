@@ -22,8 +22,8 @@ class Downloader:
 
     # try to get more info
     if consts.TEST:
-      final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M3$Z0$33607/L%27Empereur%20de%20Paris.mkv'
-      filename = urllib.parse.unquote(os.path.basename(final_url))
+      final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M2$M1$C1870$34874/01%20Hooked%20On%20A%20Feeling.mp3'
+      filename = 'Blade.Runner.2049.2017.MULTI.1080p.mkv'
       filesize = 0
     else:
       result = subprocess.run(['/usr/local/bin/plowdown -q --skip-final --printf %d ' + url], shell=True, capture_output=True, text=True)
@@ -154,15 +154,17 @@ class Downloader:
     # done
     return status
 
-  def finalize(self, dld, dest):
+  def finalize(self, dld, dest, title):
 
     try:
-      fullpath = self.cwd + '/' + dld.filename
-      os.rename(fullpath, dest)
-      dld.status = STATUS_COMPLETED
+      fullsrc = self.cwd + '/' + dld.filename
+      fulldst = dest + '/' + title + utils.extension(dld.filename)
+      os.rename(fullsrc, fulldst)
+      dld.status = consts.STATUS_PROCESSED
       dld.save()
-      return dld
-    except:
+      return True
+    except Exception as ex:
+      print(ex)
       return False
 
   def cancel(self, dld):
@@ -174,7 +176,7 @@ class Downloader:
     dld.status = consts.STATUS_CANCELLED
     dld.save()
 
-    # succesfull
+    # successful
     return True
 
   def __cleanup(self, dld):

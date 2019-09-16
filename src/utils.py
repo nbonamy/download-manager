@@ -1,8 +1,12 @@
+import os
 import re
 import datetime
 from math import log2
 
 _suffixes = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+def extension(filename):
+	return os.path.splitext(filename)[1]
 
 def humansize(size):
   # determine binary order in steps of size 10
@@ -27,7 +31,7 @@ def extractTitle(filename):
   # scan
   for i in range(len(parts)):
     part = parts[i].lower()
-    m = re.match(r'^([0-9][0-9][0-9][0-9])$', part) 
+    m = re.match(r'^([0-9][0-9][0-9][0-9])$', part)
     if m:
       if lastDate == len(parts)-1:
         year = int(m.groups(0)[0])

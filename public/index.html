@@ -1,112 +1,144 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Download Manager</title>
-		<link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
-		<link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
-    <link rel="stylesheet" href="css/index.css">
-		<script defer src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
-		<script defer src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
-		<script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
-		<script defer src="js/index.js"></script>
-  </head>
-  <body>
-		<div id="app">
-			<div class="fabtn has-background-success" @click="add()">
-				<i class="mdi mdi-plus"></i>
-			</div>
-			<section class="hero">
-				<div class="hero-body">
-					<div class="container">
-						<h1 class="title">Download Manager</h1>
-						<h2 class="subtitle" v-if="downloads == null || downloads.length == 0">
-							Click the <i class="mdi mdi-plus-cirle"></i> button to start a new download!
-						</h2>
-					</div>
-				</div>
-			</section>
-			<section class="section">
-				<div class="container" v-if="downloads != null && downloads.length > 0">
-					<div class="title is-4"><i class="mdi mdi-file-download-outline"></i> Downloads</div>
-					<table class="table">
-						<thead>
-							<th>URL</th>
-							<th>Filename</th>
-							<th>Status</th>
-							<th>Speed</th>
-							<th>Time&nbsp;Left</th>
-							<th>Actions</th>
-						</thead>
-						<tbody>
-							<tr v-for="item in downloads">
-								<td>{{ item.info.url }}</td>
-								<td>{{ item.info.filename }}</td>
-								<td>
-									<span v-if="item.status == 'downloading'" class="tabular-number">{{ item.progress }}%</span>
-									<span v-else>{{ item.status }}</span>
-								</td>
-								<td class="tabular-number">{{ item.speed }}</td>
-								<td class="tabular-number">{{ item.time_left }}</td>
-								<td>
-									<a href="#" @click="cancel(item)"	v-if="item.status == 'downloading'">
-										<span class="icon has-text-danger">
-											<i class="mdi mdi-stop-circle"></i>
-										</span>
-									</a>
-									<a href="#" @click="finalize(item)"	v-if="item.status == 'completed'">
-										<span class="icon has-text-info">
-											<i class="mdi mdi-chevron-double-right"></i>
-										</span>
-									</a>
-									<a href="#" @click="start(item)" v-if="['created', 'error'].includes(item.status)">
-										<span class="icon has-text-primary">
-											<i class="mdi mdi-reload"></i>
-										</span>
-									</a>
-									<a href="#" @click="purge(item)" v-if="['error', 'completed'].includes(item.status)">
-										<span class="icon has-text-danger">
-											<i class="mdi mdi-delete"></i>
-										</span>
-									</a>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div class="container history" v-if="history != null && history.length > 0">
-					<div class="title is-4"><i class="mdi mdi-history"></i> History</div>
-					<table class="table">
-						<thead>
-							<th>URL</th>
-							<th>Filename</th>
-							<th>Status</th>
-							<th>Actions</th>
-						</thead>
-						<tbody>
-							<tr v-for="item in history">
-								<td>{{ item.info.url }}</td>
-								<td>{{ item.info.filename }}</td>
-								<td>{{ item.status }}</td>
-								<td>
-									<a href="#" @click="start(item)" v-if="item.status == 'cancelled'">
-										<span class="icon has-text-primary">
-											<i class="mdi mdi-reload"></i>
-										</span>
-									</a>
-									<a href="#" @click="purge(item)">
-										<span class="icon has-text-danger">
-											<i class="mdi mdi-delete"></i>
-										</span>
-									</a>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</section>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Download Manager</title>
+	<link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+	<link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
+	<link rel="stylesheet" href="css/index.css">
+	<script defer src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script defer src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+	<script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script defer src="js/index.js"></script>
+</head>
+
+<body>
+	<div id="app">
+		<div class="fabtn has-background-success" @click="add()">
+			<i class="mdi mdi-plus"></i>
 		</div>
-  </body>
+		<section class="hero">
+			<div class="hero-body">
+				<div class="container">
+					<h1 class="title">Download Manager</h1>
+					<h2 class="subtitle" v-if="downloads == null || downloads.length == 0">
+						Click the <i class="mdi mdi-plus-cirle"></i> button to start a new download!
+					</h2>
+				</div>
+			</div>
+		</section>
+		<section class="section">
+			<div class="container" v-if="downloads != null && downloads.length > 0">
+				<div class="title is-4"><i class="mdi mdi-file-download-outline"></i> Downloads</div>
+				<table class="table">
+					<thead>
+						<th>URL</th>
+						<th>Filename</th>
+						<th>Status</th>
+						<th>Speed</th>
+						<th>Time&nbsp;Left</th>
+						<th>Actions</th>
+					</thead>
+					<tbody>
+						<tr v-for="item in downloads">
+							<td>{{ item.info.url }}</td>
+							<td>{{ item.info.filename }}</td>
+							<td>
+								<span v-if="item.status == 'downloading'" class="tabular-number">{{ item.progress }}%</span>
+								<span v-else>{{ item.status }}</span>
+							</td>
+							<td class="tabular-number">{{ item.speed }}</td>
+							<td class="tabular-number">{{ item.time_left }}</td>
+							<td>
+								<a href="#" @click="cancel(item)" v-if="item.status == 'downloading'">
+									<span class="icon has-text-danger">
+										<i class="mdi mdi-stop-circle"></i>
+									</span>
+								</a>
+								<a href="#" @click="finalize(item)" v-if="item.status == 'completed'">
+									<span class="icon has-text-info">
+										<i class="mdi mdi-chevron-double-right"></i>
+									</span>
+								</a>
+								<a href="#" @click="start(item)" v-if="['created', 'error'].includes(item.status)">
+									<span class="icon has-text-primary">
+										<i class="mdi mdi-reload"></i>
+									</span>
+								</a>
+								<a href="#" @click="purge(item)" v-if="['error', 'completed'].includes(item.status)">
+									<span class="icon has-text-danger">
+										<i class="mdi mdi-delete"></i>
+									</span>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="container history" v-if="history != null && history.length > 0">
+				<div class="title is-4"><i class="mdi mdi-history"></i> History</div>
+				<table class="table">
+					<thead>
+						<th>URL</th>
+						<th>Filename</th>
+						<th>Status</th>
+						<th>Actions</th>
+					</thead>
+					<tbody>
+						<tr v-for="item in history">
+							<td>{{ item.info.url }}</td>
+							<td>{{ item.info.filename }}</td>
+							<td>{{ item.status }}</td>
+							<td>
+								<a href="#" @click="start(item)" v-if="item.status == 'cancelled'">
+									<span class="icon has-text-primary">
+										<i class="mdi mdi-reload"></i>
+									</span>
+								</a>
+								<a href="#" @click="purge(item)">
+									<span class="icon has-text-danger">
+										<i class="mdi mdi-delete"></i>
+									</span>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+		<template>
+			<section>
+				<b-modal :active.sync="showFinalize" has-modal-card>
+					<div class="modal-card" style="width: auto; min-width: 400px; max-width: 800px;">
+						<header class="modal-card-head">
+							<p class="modal-card-title has-text-weight-semibold">Finalize download</p>
+						</header>
+						<section class="modal-card-body">
+							<b-field label="Title">
+								<b-input type="text" v-model="title" placeholder="Movie Title" required>
+								</b-input>
+							</b-field>
+							<b-field label="Destination">
+								<b-select placeholder="Select a destination folder" v-model="destination" :expanded="true" required>
+									<option v-for="dest in destinations" :value="dest" :key="dest">
+										{{ dest }}
+									</option>
+								</b-select>
+							</b-field>
+						</section>
+						<footer class="modal-card-foot" style="justify-content: flex-end;">
+							<button class="button" type="button" @click="showFinalize=false">Cancel</button>
+							<button class="button is-primary" @click="doFinalize">Finalize</button>
+						</footer>
+					</div>
+				</b-modal>
+			</section>
+		</template>
+	</div>
+
+</body>
+
 </html>

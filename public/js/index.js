@@ -4,7 +4,12 @@ var vm = new Vue({
   el: '#app',
   data: {
     downloads: null,
-    history: null
+    history: null,
+    showFinalize: false,
+    currentItem: null,
+    title: null,
+    destinations: null,
+    destination: null
   },
   methods: {
     refresh() {
@@ -43,7 +48,24 @@ var vm = new Vue({
       });
     },
     finalize(item) {
-      alert(item.id)
+      axios.get('/ws/title/' + item.id).then(response => {
+        vm.title = response.data.title
+      });
+      axios.get('/ws/destinations').then(response => {
+        vm.destinations = response.data.items
+        vm.destination = vm.destinations[0]
+      });
+      vm.currentItem = item;
+      vm.showFinalize = true;
+    },
+    doFinalize() {
+      url = '/ws/finalize/' + vm.currentItem.id;
+      url += '?title=' + encodeURIComponent(vm.title);
+      url += '&dest=' + encodeURIComponent(vm.destination)
+      axios.get(url).then(response => {
+        vm.showFinalize = false;
+        vm.refresh();
+      });
     },
     purge(item) {
       axios.get('/ws/purge/' + item.id).then(response => {
