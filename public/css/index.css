@@ -1,4 +1,35 @@
 
+.table {
+	width: 80%;
+	margin: 0 auto;
+}
+
+.table th {
+	border-color: #7a7a7a;
+}
+
+.table td {
+	border-bottom-width: 1px !important;
+	border-bottom-color: #dbdbdb;
+}
+
+.container .title.is-4 {
+	width: 90%;
+	margin: 0px auto 32px;
+	padding-bottom: 16px;
+	border-bottom-width: 1px !important;
+	border-bottom-color: #7a7a7a;
+	border-bottom-style: solid;
+}
+
+.container .table {
+	margin-bottom: 64px;
+}
+
+.history, .history .table {
+	color: #888 !important;
+}
+
 .icon {
 	font-size: 20px;
 }

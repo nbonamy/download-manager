@@ -18,8 +18,19 @@
 			<div class="fabtn has-background-success" @click="add()">
 				<i class="mdi mdi-plus"></i>
 			</div>
+			<section class="hero">
+				<div class="hero-body">
+					<div class="container">
+						<h1 class="title">Download Manager</h1>
+						<h2 class="subtitle" v-if="downloads == null || downloads.length == 0">
+							Click the <i class="mdi mdi-plus-cirle"></i> button to start a new download!
+						</h2>
+					</div>
+				</div>
+			</section>
 			<section class="section">
-				<div class="container">
+				<div class="container" v-if="downloads != null && downloads.length > 0">
+					<div class="title is-4"><i class="mdi mdi-file-download-outline"></i> Downloads</div>
 					<table class="table">
 						<thead>
 							<th>URL</th>
@@ -50,12 +61,23 @@
 											<i class="mdi mdi-chevron-double-right"></i>
 										</span>
 									</a>
+									<a href="#" @click="purge(item)" v-if="item.status == 'completed'">
+										<span class="icon has-text-danger">
+											<i class="mdi mdi-delete"></i>
+										</span>
+									</a>
+									<a href="#" @click="start(item)" v-if="item.status == 'error'">
+										<span class="icon has-text-primary">
+											<i class="mdi mdi-reload"></i>
+										</span>
+									</a>
 								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
-				<div class="container" v-if="history != null && history.length > 0">
+				<div class="container history" v-if="history != null && history.length > 0">
+					<div class="title is-4"><i class="mdi mdi-history"></i> History</div>
 					<table class="table">
 						<thead>
 							<th>URL</th>
@@ -69,6 +91,11 @@
 								<td>{{ item.info.filename }}</td>
 								<td>{{ item.status }}</td>
 								<td>
+									<a href="#" @click="start(item)" v-if="item.status == 'cancelled'">
+										<span class="icon has-text-primary">
+											<i class="mdi mdi-reload"></i>
+										</span>
+									</a>
 									<a href="#" @click="purge(item)">
 										<span class="icon has-text-danger">
 											<i class="mdi mdi-delete"></i>

@@ -35,6 +35,12 @@ var vm = new Vue({
         }
       });
     },
+    start(item) {
+      axios.get('/ws/start/' + item.id).then(response => {
+        vm.refreshStatus();
+        setTimeout(vm.refreshHistory, 1000);
+      });
+    },
     finalize(item) {
       alert(item.id)
     },
