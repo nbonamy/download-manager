@@ -17,6 +17,12 @@ def init():
   database.create_tables([Download])
   return 'OK'
 
+@app.route('/ws/status')
+def status():
+  downloader = Downloader(consts.DOWNLOAD_DIR)
+  downloads = Download.select().where((Download.status != consts.STATUS_PROCESSED) & (Download.status != consts.STATUS_CANCELLED)).order_by(Download.started_at.desc())
+  return jsonify({'items':[downloader.get_status(d) for d in downloads]})
+
 @app.route('/ws/history')
 def list():
   downloader = Downloader(consts.DOWNLOAD_DIR)
@@ -45,24 +51,6 @@ def download():
   # done
   return jsonify(model_to_dict(download))
 
-@app.route('/ws/status')
-def status_all():
-
-  downloader = Downloader(consts.DOWNLOAD_DIR)
-  downloads = Download.select().where((Download.status != consts.STATUS_PROCESSED) & (Download.status != consts.STATUS_CANCELLED)).order_by(Download.started_at.desc())
-  return jsonify({'items':[downloader.get_status(d) for d in downloads]})
-
-@app.route('/ws/status/<id>')
-def status_one(id):
-
-  try:
-    download = Download.get_by_id(id)
-  except:
-    abort(404)
-
-  downloader = Downloader(consts.DOWNLOAD_DIR)
-  return jsonify(downloader.get_status(download))
-
 @app.route('/ws/start/<id>')
 def start(id):
 
@@ -78,6 +66,17 @@ def start(id):
 
   # done
   return jsonify(model_to_dict(download))
+
+@app.route('/ws/status/<id>')
+def status_one(id):
+
+  try:
+    download = Download.get_by_id(id)
+  except:
+    abort(404)
+
+  downloader = Downloader(consts.DOWNLOAD_DIR)
+  return jsonify(downloader.get_status(download))
 
 @app.route('/ws/cancel/<id>')
 def cancel(id):
