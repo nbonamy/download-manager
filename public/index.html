@@ -17,7 +17,7 @@
 
 <body>
 	<div id="app">
-		<div class="fabtn has-background-success" @click="add()">
+		<div class="fabtn has-background-success" @click="add()" v-if="cfg_errors == null || cfg_errors.length == 0">
 			<i class="mdi mdi-plus"></i>
 		</div>
 		<section class="hero">
@@ -30,7 +30,21 @@
 				</div>
 			</div>
 		</section>
-		<section class="section">
+		<section class="section" v-if="cfg_errors != null && cfg_errors.length > 0">
+			<article class="message is-danger is-centered">
+				<div class="message-header">
+					<p>Configuration Error</p>
+				</div>
+				<div class="message-body">
+					<div>You need to configure some parameters before using DownloadManager</div>
+					<ul>
+						<li v-for="error in cfg_errors">{{ error }}</li>
+					</ul>
+					<div>Please fix and reload this page.</div>
+				</div>
+			</article>
+		</section>
+		<section class="section" v-else>
 			<div class="container" v-if="downloads != null && downloads.length > 0">
 				<div class="title is-4"><i class="mdi mdi-file-download-outline"></i> Downloads</div>
 				<table class="table">

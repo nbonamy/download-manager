@@ -3,6 +3,7 @@
 var vm = new Vue({
   el: '#app',
   data: {
+    cfg_errors: null,
     downloads: null,
     history: null,
     showFinalize: false,
@@ -92,7 +93,13 @@ var vm = new Vue({
     }
   },
   beforeMount() {
-    this.refresh();
-    setInterval(() => this.refreshStatus(), 1000);
+    axios.get('/ws/check').then(response => {
+      if (response.data.status == 'ok') {
+        this.refresh();
+        setInterval(() => this.refreshStatus(), 1000);
+      } else {
+        vm.cfg_errors = response.data.errors;
+      }
+    })
   }
 })

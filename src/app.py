@@ -16,8 +16,17 @@ app = Flask(__name__)
 @app.before_request
 def before_request():
   app.config.config = Config(consts.CONFIG_PATH)
-  if app.config.config.download_path() is None or app.config.config.target_path() is None:
-    abort(500)
+
+@app.route('/ws/check')
+def check():
+  errors = []
+  if app.config.config.download_path() is None:
+    errors.append('Download path missing from configuration')
+  if app.config.config.target_path() is None:
+    errors.append('Target path missing from configuration')
+  if len(errors):
+    return jsonify({'status': 'ko', 'errors': errors})
+  return jsonify({'status': 'ok'})
 
 @app.route('/ws/init')
 def init():
