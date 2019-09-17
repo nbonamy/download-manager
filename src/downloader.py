@@ -77,7 +77,7 @@ class Downloader:
       else:
         p = subprocess.Popen(['plowdown', '-q', dld.url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
       dld.pid = p.pid
-      dld.status = consts.STATUS_DOWNLOADING
+      dld.status = consts.STATUS_STARTING
       dld.started_at = datetime.datetime.now()
       dld.save()
       return True
@@ -98,12 +98,26 @@ class Downloader:
       'eta': '',
     }
 
-    # downloading is the more complex
-    # and may update the status
+    # the full path to the file
+    fullpath = self.__get_fullpath(dld)
+    elapsed = datetime.datetime.now() - dld.started_at
+    elapsed = elapsed.days * 86400 + elapsed.seconds
+
+    # first leave starting status
+    if dld.status == consts.STATUS_STARTING:
+      if os.path.exists(fullpath):
+        dld.status = consts.STATUS_DOWNLOADING
+        dld.save()
+      else:
+        if elapsed > 5:
+          status['status'] = 'error'
+        else:
+          status['status'] = 'starting'
+
+    # then downloading is the more and may update the status
     if dld.status == consts.STATUS_DOWNLOADING:
 
       # first check file
-      fullpath = self.__get_fullpath(dld)
       if os.path.exists(fullpath):
         statinfo = os.stat(fullpath)
         currsize = statinfo.st_size
@@ -117,27 +131,30 @@ class Downloader:
           try:
             p = psutil.Process(dld.pid)
             if p.status() in (psutil.STATUS_STOPPED, psutil.STATUS_ZOMBIE, psutil.STATUS_DEAD):
-              raise Exception()
+              raise RuntimeError('Invalid process status: ' + p.status())
 
             # download in progress
             status['status'] = 'downloading'
 
             # calculate download speed
-            diff = datetime.datetime.now() - dld.started_at
-            elapsed = diff.days * 86400 + diff.seconds
-            speed = currsize / elapsed
-            status['speed'] = utils.humansize(speed) + '/s'
+            if elapsed > 0:
 
-            # calculate left
-            left_bytes = dld.filesize - currsize;
-            left_seconds = left_bytes / speed
-            delta = datetime.timedelta(0, left_seconds)
-            status['time_left'] = str(delta).split('.')[0]
-            status['eta'] = '{0:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now() + delta)
-          except:
+              speed = currsize / elapsed
+              status['speed'] = utils.humansize(speed) + '/s'
+
+              # calculate left
+              left_bytes = dld.filesize - currsize;
+              left_seconds = left_bytes / speed
+              delta = datetime.timedelta(0, left_seconds)
+              status['time_left'] = str(delta).split('.')[0]
+              status['eta'] = '{0:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now() + delta)
+
+          except Exception as ex:
+            print('Reporting error during download', dld.filename, ex)
             status['status'] = 'error'
 
       else:
+        print('File does not exist during download', dld.filename)
         status['status'] = 'error'
 
     # others are simple
@@ -205,5 +222,5 @@ class Downloader:
       except:
         print('Could not delete files')
     else:
-        print('File not found', fullpath)
+        print('No file to cleanup: ', fullpath)
 
