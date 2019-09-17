@@ -1,10 +1,16 @@
-import datetime
+import os
 import consts
+import datetime
 from peewee import *
 
 database = SqliteDatabase(consts.DATABASE_PATH, pragmas={
   'journal_mode': 'wal'
 })
+
+def create_database():
+  if not os.path.exists(consts.DATABASE_PATH):
+    database.connect()
+    database.create_tables([Download])
 
 class BaseModel(Model):
   class Meta:

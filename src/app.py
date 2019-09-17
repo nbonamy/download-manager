@@ -8,10 +8,11 @@ from config import Config
 from downloader import Downloader
 from playhouse.shortcuts import model_to_dict
 from flask import Flask, request, jsonify, abort
-from model import database, Download
+from model import create_database, Download
 
 # the apps
 app = Flask(__name__)
+create_database()
 
 @app.before_request
 def before_request():
@@ -19,6 +20,8 @@ def before_request():
 
 @app.route('/ws/check')
 def check():
+
+  # check configuration
   errors = []
   if app.config.config.download_path() is None:
     errors.append('Download path missing from configuration')
@@ -26,12 +29,13 @@ def check():
     errors.append('Target path missing from configuration')
   if len(errors):
     return jsonify({'status': 'ko', 'errors': errors})
+
+  # seems good!
   return jsonify({'status': 'ok'})
 
 @app.route('/ws/init')
 def init():
-  database.connect()
-  database.create_tables([Download])
+  create_database()
   return 'OK'
 
 @app.route('/ws/status')
