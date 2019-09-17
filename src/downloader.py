@@ -75,7 +75,7 @@ class Downloader:
       if self.config.is_testing():
         p = subprocess.Popen(['wget', '-q', dld.download_url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
       else:
-        p = subprocess.Popen(['plowdown', '-q', dld.url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
+        p = subprocess.Popen(['plowdown', '-q', '-o', self.config.download_path(), dld.url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
       dld.pid = p.pid
       dld.status = consts.STATUS_STARTING
       dld.started_at = datetime.datetime.now()
