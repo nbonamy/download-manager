@@ -2,7 +2,7 @@ import datetime
 import consts
 from peewee import *
 
-database = SqliteDatabase('../data/downloads.db', pragmas={
+database = SqliteDatabase(consts.DATABASE_PATH, pragmas={
   'journal_mode': 'wal'
 })
 

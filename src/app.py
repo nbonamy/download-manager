@@ -1,9 +1,10 @@
 import re
+import utils
+import consts
 import os.path
 import subprocess
-import consts
 import urllib.parse
-import utils
+from config import Config
 from downloader import Downloader
 from playhouse.shortcuts import model_to_dict
 from flask import Flask, request, jsonify, abort
@@ -11,6 +12,12 @@ from model import database, Download
 
 # the apps
 app = Flask(__name__)
+
+@app.before_request
+def before_request():
+  app.config.config = Config(consts.CONFIG_PATH)
+  if app.config.config.download_path() is None or app.config.config.target_path() is None:
+    abort(500)
 
 @app.route('/ws/init')
 def init():
@@ -20,13 +27,13 @@ def init():
 
 @app.route('/ws/status')
 def status():
-  downloader = Downloader(consts.DOWNLOAD_DIR)
+  downloader = Downloader(app.config.config)
   downloads = Download.select().where((Download.status != consts.STATUS_PROCESSED) & (Download.status != consts.STATUS_CANCELLED)).order_by(Download.started_at.desc())
   return jsonify({'items':[downloader.get_status(d) for d in downloads]})
 
 @app.route('/ws/history')
 def list():
-  downloader = Downloader(consts.DOWNLOAD_DIR)
+  downloader = Downloader(app.config.config)
   downloads = Download.select().where((Download.status >= consts.STATUS_PROCESSED) | (Download.status < 0)).order_by(Download.started_at.desc())
   return jsonify({'items':[downloader.get_status(d) for d in downloads]})
 
@@ -40,7 +47,7 @@ def download():
     abort(400)
 
   # try to get more info
-  downloader = Downloader(consts.DOWNLOAD_DIR)
+  downloader = Downloader(app.config.config)
   download = downloader.get_download_info(url)
   if download is None:
     abort(500)
@@ -61,7 +68,7 @@ def start(id):
     abort(404)
 
   # now run download process
-  downloader = Downloader(consts.DOWNLOAD_DIR)
+  downloader = Downloader(app.config.config)
   if downloader.download(download) is False:
     abort(500)
 
@@ -76,7 +83,7 @@ def status_one(id):
   except:
     abort(404)
 
-  downloader = Downloader(consts.DOWNLOAD_DIR)
+  downloader = Downloader(app.config.config)
   return jsonify(downloader.get_status(download))
 
 @app.route('/ws/title/<id>')
@@ -93,7 +100,7 @@ def title(id):
 def destinations():
 
   dirs = []
-  for dirname, dirnames, filenames in os.walk(consts.TARGET_DIR):
+  for dirname, dirnames, filenames in os.walk(app.config.config.target_path()):
 
     while True:
       size = len(dirnames)
@@ -128,7 +135,7 @@ def finalize(id):
   except:
     abort(404)
 
-  downloader = Downloader(consts.DOWNLOAD_DIR)
+  downloader = Downloader(app.config.config)
   if downloader.finalize(download, dest, title):
     return jsonify({'status': 'ok'})
   else:
@@ -142,7 +149,7 @@ def cancel(id):
   except:
     abort(404)
 
-  downloader = Downloader(consts.DOWNLOAD_DIR)
+  downloader = Downloader(app.config.config)
   if downloader.cancel(download):
     return jsonify({'status': 'ok'})
   else:

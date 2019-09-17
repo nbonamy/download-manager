@@ -13,17 +13,18 @@ from playhouse.shortcuts import model_to_dict
 
 class Downloader:
 
-  cwd = ''
+  config = None
 
-  def __init__(self, cwd):
-    self.cwd = cwd
+  def __init__(self, config):
+    self.config = config
 
   def get_download_info(self, url):
 
     # try to get more info
     if consts.TEST:
       final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M2$M1$C1870$34874/01%20Hooked%20On%20A%20Feeling.mp3'
-      filename = 'Blade.Runner.2049.2017.MULTI.1080p.mkv'
+      final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M3$Z0$33607/L%27Empereur%20de%20Paris.mkv'
+      filename = urllib.parse.unquote(os.path.basename(final_url))
       filesize = 0
     else:
       result = subprocess.run(['/usr/local/bin/plowdown -q --skip-final --printf %d ' + url], shell=True, capture_output=True, text=True)
@@ -69,11 +70,12 @@ class Downloader:
     # cleanup
     self.__cleanup(dld)
 
+    # do it
     try:
       if consts.TEST:
-        p = subprocess.Popen(['/usr/local/bin/wget', '-q', dld.download_url, '&'], cwd=self.cwd, preexec_fn=os.setsid)
+        p = subprocess.Popen(['wget', '-q', dld.download_url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
       else:
-        p = subprocess.Popen(['/usr/local/bin/plowdown', '-q', dld.url, '&'], cwd=self.cwd, preexec_fn=os.setsid)
+        p = subprocess.Popen(['plowdown', '-q', dld.url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
       dld.pid = p.pid
       dld.status = consts.STATUS_DOWNLOADING
       dld.started_at = datetime.datetime.now()
@@ -101,7 +103,7 @@ class Downloader:
     if dld.status == consts.STATUS_DOWNLOADING:
 
       # first check file
-      fullpath = self.cwd + '/' + dld.filename
+      fullpath = self.__get_fullpath(dld)
       if os.path.exists(fullpath):
         statinfo = os.stat(fullpath)
         currsize = statinfo.st_size
@@ -157,7 +159,7 @@ class Downloader:
   def finalize(self, dld, dest, title):
 
     try:
-      fullsrc = self.cwd + '/' + dld.filename
+      fullsrc = self.__get_fullpath(dld)
       fulldst = dest + '/' + title + utils.extension(dld.filename)
       os.rename(fullsrc, fulldst)
       dld.status = consts.STATUS_PROCESSED
@@ -179,6 +181,9 @@ class Downloader:
     # successful
     return True
 
+  def __get_fullpath(self, dld):
+    return self.config.download_path() + '/' + dld.filename
+
   def __cleanup(self, dld):
 
     # first kill process
@@ -193,7 +198,7 @@ class Downloader:
         print('Could not terminate process')
 
     # delete file
-    fullpath = self.cwd + '/' + dld.filename
+    fullpath = self.__get_fullpath(dld)
     if os.path.exists(fullpath):
       try:
         os.remove(fullpath)
