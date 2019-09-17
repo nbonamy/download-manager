@@ -1,7 +1,4 @@
 
-# test
-TEST = 1
-
 # paths
 DATABASE_PATH = '../data/downloads.db'
 CONFIG_PATH = '../config/downloads.conf'

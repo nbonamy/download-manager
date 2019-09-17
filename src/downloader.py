@@ -21,7 +21,7 @@ class Downloader:
   def get_download_info(self, url):
 
     # try to get more info
-    if consts.TEST:
+    if self.config.is_testing():
       final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M2$M1$C1870$34874/01%20Hooked%20On%20A%20Feeling.mp3'
       final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M3$Z0$33607/L%27Empereur%20de%20Paris.mkv'
       filename = urllib.parse.unquote(os.path.basename(final_url))
@@ -72,7 +72,7 @@ class Downloader:
 
     # do it
     try:
-      if consts.TEST:
+      if self.config.is_testing():
         p = subprocess.Popen(['wget', '-q', dld.download_url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
       else:
         p = subprocess.Popen(['plowdown', '-q', dld.url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
