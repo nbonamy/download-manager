@@ -28,7 +28,7 @@ class Downloader:
       filesize = 0
     else:
       result = subprocess.run(['/usr/local/bin/plowdown -q --skip-final --printf %d ' + url], shell=True, capture_output=True, text=True)
-      if result.returncode != 0:
+      if result.returncode != 0 or len(result.stdout) == 0:
         return None
 
       # final url
@@ -125,7 +125,9 @@ class Downloader:
           dld.status = consts.STATUS_COMPLETED
           dld.save()
         else:
-          status['progress'] = '{0:2.1f}'.format(currsize / dld.filesize * 100)
+
+          if dld.filesize > 0:
+            status['progress'] = '{0:2.1f}'.format(currsize / dld.filesize * 100)
 
           # now check processs
           try:
@@ -143,11 +145,12 @@ class Downloader:
               status['speed'] = utils.humansize(speed) + '/s'
 
               # calculate left
-              left_bytes = dld.filesize - currsize;
-              left_seconds = left_bytes / speed
-              delta = datetime.timedelta(0, left_seconds)
-              status['time_left'] = str(delta).split('.')[0]
-              status['eta'] = '{0:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now() + delta)
+              if dld.filesize > 0:
+                left_bytes = dld.filesize - currsize;
+                left_seconds = left_bytes / speed
+                delta = datetime.timedelta(0, left_seconds)
+                status['time_left'] = str(delta).split('.')[0]
+                status['eta'] = '{0:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now() + delta)
 
           except Exception as ex:
             print('Reporting error during download', dld.filename, ex)

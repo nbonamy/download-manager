@@ -74,7 +74,8 @@ var vm = new Vue({
       });
     },
     add() {
-      this.$buefy.dialog.prompt({
+      var self = this;
+      self.$buefy.dialog.prompt({
         title: 'Paste the URL to download',
         confirmText: 'Download',
         type: 'is-success',
@@ -86,6 +87,15 @@ var vm = new Vue({
           if (value.length > 0) {
             axios.get('/ws/download?url=' + value).then(response => {
               vm.refreshStatus();
+            }).catch(function (error) {
+              self.$buefy.dialog.alert({
+                title: 'Error',
+                message: 'Download could not be started',
+                type: 'is-danger',
+                hasIcon: true,
+                icon: 'alert-circle',
+                iconPack: 'mdi'
+              })
             });
           }
         }
