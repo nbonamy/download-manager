@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Download Manager</title>
+	<title>downtobox</title>
 	<link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
 	<link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
@@ -23,9 +23,9 @@
 		<section class="hero">
 			<div class="hero-body">
 				<div class="container">
-					<h1 class="title">Download Manager</h1>
+					<h1 class="title">downtobox</h1>
 					<h2 class="subtitle" v-if="downloads == null || downloads.length == 0">
-						Click the <i class="mdi mdi-plus-cirle"></i> button to start a new download!
+						click the <i class="mdi mdi-plus-cirle"></i> button to start a new download!
 					</h2>
 				</div>
 			</div>
@@ -36,7 +36,7 @@
 					<p>Configuration Error</p>
 				</div>
 				<div class="message-body">
-					<div>You need to configure some parameters before using DownloadManager</div>
+					<div>You need to configure some parameters before using downtobox.</div>
 					<ul>
 						<li v-for="error in cfg_errors">{{ error }}</li>
 					</ul>
@@ -82,7 +82,7 @@
 										<i class="mdi mdi-reload"></i>
 									</span>
 								</a>
-								<a href="#" @click="purge(item)" v-if="['error', 'completed'].includes(item.status)">
+								<a href="#" @click="purge(item)" v-if="item.status != 'downloading'">
 									<span class="icon has-text-danger">
 										<i class="mdi mdi-delete"></i>
 									</span>

@@ -1,10 +1,10 @@
 import configparser
 
 # config
-CONFIG_SECTION_GENERAL = 'general'
-CONFIG_OPTION_DOWNLOAD_PATH = 'download_path'
-CONFIG_OPTION_TARGET_PATH = 'target_path'
-CONFIG_OPTION_TESTING = 'test'
+CONFIG_SECTION_GENERAL = 'General'
+CONFIG_OPTION_DOWNLOAD_PATH = 'DownloadPath'
+CONFIG_OPTION_TARGET_PATH = 'TargetPath'
+CONFIG_OPTION_TESTING = 'Test'
 
 class Config:
 

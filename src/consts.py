@@ -1,7 +1,7 @@
 
 # paths
-DATABASE_PATH = '../data/downloads.db'
-CONFIG_PATH = '../config/downloads.conf'
+DATABASE_PATH = '../data/downtobox.db'
+CONFIG_PATH = '../config/downtobox.conf'
 
 # status
 STATUS_ERROR = -1
