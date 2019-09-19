@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
 	<link rel="stylesheet" href="css/index.css">
 	<script defer src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js"></script>
 	<script defer src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
 	<script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script defer src="js/index.js"></script>
@@ -18,7 +19,8 @@
 
 <body>
 	<div id="app">
-		<div class="fabtn has-background-success" @click="add()" v-if="cfg_errors == null || cfg_errors.length == 0">
+		<b-loading :is-full-page="true" :active.sync="isLoading" :can-cancel="false"></b-loading>
+				<div class="fabtn has-background-success" @click="add()" v-if="configErrors == null || configErrors.length == 0">
 			<i class="mdi mdi-plus"></i>
 		</div>
 		<section class="hero">
@@ -31,7 +33,7 @@
 				</div>
 			</div>
 		</section>
-		<section class="section" v-if="cfg_errors != null && cfg_errors.length > 0">
+		<section class="section" v-if="configErrors != null && configErrors.length > 0">
 			<article class="message is-danger is-centered">
 				<div class="message-header">
 					<p>Configuration Error</p>
@@ -39,7 +41,7 @@
 				<div class="message-body">
 					<div>You need to configure some parameters before using downtobox.</div>
 					<ul>
-						<li v-for="error in cfg_errors">{{ error }}</li>
+						<li v-for="error in configErrors">{{ error }}</li>
 					</ul>
 					<div>Please fix and reload this page.</div>
 				</div>

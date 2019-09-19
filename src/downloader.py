@@ -60,7 +60,6 @@ class Downloader:
     download.download_url = final_url
     download.filename = filename
     download.filesize = filesize
-    download.save()
 
     # done
     return download

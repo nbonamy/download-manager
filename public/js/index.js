@@ -1,9 +1,15 @@
 
 // init vue
+var router = new VueRouter({
+  mode: 'history',
+  routes: []
+});
 var vm = new Vue({
   el: '#app',
+  router,
   data: {
-    cfg_errors: null,
+    isLoading: false,
+    configErrors: null,
     downloads: null,
     history: null,
     showFinalize: false,
@@ -85,21 +91,24 @@ var vm = new Vue({
         },
         onConfirm: (value) => {
           if (value.length > 0) {
-            axios.get('/ws/download?url=' + value).then(response => {
-              vm.refreshStatus();
-            }).catch(function (error) {
-              self.$buefy.dialog.alert({
-                title: 'Error',
-                message: 'Download could not be started',
-                type: 'is-danger',
-                hasIcon: true,
-                icon: 'alert-circle',
-                iconPack: 'mdi'
-              })
-            });
+            this.download(value);
           }
         }
       })
+    },
+    download(url) {
+      axios.get('/ws/download?url=' + url).then(response => {
+        vm.refreshStatus();
+      }).catch(function (error) {
+        self.$buefy.dialog.alert({
+          title: 'Error',
+          message: 'Download could not be started',
+          type: 'is-danger',
+          hasIcon: true,
+          icon: 'alert-circle',
+          iconPack: 'mdi'
+        })
+      });
     }
   },
   beforeMount() {
@@ -108,8 +117,26 @@ var vm = new Vue({
         this.refresh();
         setInterval(() => this.refreshStatus(), 1000);
       } else {
-        vm.cfg_errors = response.data.errors;
+        vm.configErrors = response.data.errors;
       }
     })
+  },
+  mounted: function() {
+    var self = this;
+    q = this.$route.query;
+    if (q.url != null) {
+      this.isLoading = true;
+      axios.get('/ws/info?url=' + q.url).then(response => {
+        this.$buefy.dialog.confirm({
+          title: 'Confirm download',
+          message: '<p>Do you really want to download <b>' + response.data.title + '</b>?</p><p class="is-italic is-size-7"><br/>' + response.data.info.filename + '</p>',
+          onConfirm: () => {
+            self.download(q.url);
+          }
+        });
+      }).finally(function (error) {
+        self.isLoading = false;
+      });
+    }
   }
 })

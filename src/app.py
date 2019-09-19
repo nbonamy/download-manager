@@ -50,6 +50,27 @@ def list():
   downloads = Download.select().where((Download.status >= consts.STATUS_PROCESSED) | (Download.status < 0)).order_by(Download.started_at.desc())
   return jsonify({'items':[downloader.get_status(d) for d in downloads]})
 
+@app.route('/ws/info')
+def info():
+
+  # for now
+  #url = urllib.parse.unquote(url)
+  url = request.args.get('url')
+  if len(url) < 1:
+    abort(400)
+
+  # try to get more info
+  downloader = Downloader(app.config.config)
+  download = downloader.get_download_info(url)
+  if download is None:
+    abort(500)
+
+  # done
+  return jsonify({
+    'info': model_to_dict(download),
+    'title': utils.extractTitle(download.filename)
+  })
+
 @app.route('/ws/download')
 def download():
 
