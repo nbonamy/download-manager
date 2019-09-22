@@ -27,13 +27,13 @@ class Downloader:
       filename = urllib.parse.unquote(os.path.basename(final_url))
       filesize = 0
     else:
-      result = subprocess.run(['/usr/local/bin/plowdown -q --skip-final --printf %d ' + url], shell=True, capture_output=True, text=True)
+      result = subprocess.run(['plowdown -q --skip-final --printf %d ' + url], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
       if result.returncode != 0 or len(result.stdout) == 0:
         return None
 
       # final url
       final_url = result.stdout
-      filename = os.path.basename(final_url)
+      filename = urllib.parse.unquote(os.path.basename(final_url))
       filesize = 0
 
     # now try to get filesize
