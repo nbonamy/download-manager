@@ -149,6 +149,7 @@ def destinations():
     for subdirname in dirnames:
       dirs.append(os.path.join(dirname, subdirname))
 
+  dirs.sort()
   return jsonify({'items': dirs})
 
 @app.route('/ws/finalize/<id>')
