@@ -133,8 +133,8 @@ def title(id):
 @app.route('/ws/destinations')
 def destinations():
 
-  dirs = []
-  for dirname, dirnames, filenames in os.walk(app.config.config.target_path()):
+  dirs = [ app.config.config.target_path() ]
+  for dirname, dirnames, filenames in os.walk(dirs[0]):
 
     while True:
       size = len(dirnames)
