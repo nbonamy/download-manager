@@ -46,6 +46,10 @@ article.message, .table {
 	white-space: nowrap;
 }
 
+.long-text {
+	word-break: break-all;
+}
+
 .fabtn {
 	width: 70px;
 	height: 70px;
@@ -63,6 +67,7 @@ article.message, .table {
 	position: fixed;
 	right: 50px;
 	bottom: 50px;
+	z-index: 100;
 }
 
 .fabtn:hover {

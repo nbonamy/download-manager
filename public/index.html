@@ -62,7 +62,7 @@
 					<tbody>
 						<tr v-for="item in downloads">
 							<td>{{ item.info.url }}</td>
-							<td>{{ item.info.filename }}</td>
+							<td class="long-text">{{ item.info.filename }}</td>
 							<td>
 								<span v-if="item.status == 'downloading'" class="tabular-number">{{ item.progress }}%</span>
 								<span v-else>{{ item.status }}</span>
@@ -107,7 +107,7 @@
 					<tbody>
 						<tr v-for="item in history">
 							<td>{{ item.info.url }}</td>
-							<td>{{ item.info.filename }}</td>
+							<td class="long-text">{{ item.info.filename }}</td>
 							<td>{{ item.status }}</td>
 							<td>
 								<a href="#" @click="start(item)" v-if="item.status == 'cancelled'">
