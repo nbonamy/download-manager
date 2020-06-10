@@ -43,6 +43,8 @@ class Downloader:
       c.setopt(c.URL, final_url)
       c.setopt(c.HEADER, 1)
       c.setopt(c.NOBODY, 1) # header only, no body
+      c.setopt(c.SSL_VERIFYPEER, 0)
+      c.setopt(c.SSL_VERIFYHOST, 0)
       c.setopt(c.HEADERFUNCTION, headers.write)
       c.perform()
 
