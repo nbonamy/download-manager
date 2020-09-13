@@ -34,7 +34,7 @@ class Downloader:
       # final url
       final_url = result.stdout
       filename = urllib.parse.unquote(os.path.basename(final_url))
-      filename = urllib.parse.quote(filename, safe='!#,.-_&')
+      filename = urllib.parse.quote(filename, safe=' ()!#,.-_&')
       filesize = 0
 
     # now try to get filesize
