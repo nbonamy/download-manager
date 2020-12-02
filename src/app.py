@@ -134,7 +134,7 @@ def title(id):
 def destinations():
 
   dirs = [ app.config.config.target_path() ]
-  for dirname, dirnames, filenames in os.walk(dirs[0]):
+  for dirname, dirnames, filenames in os.walk(dirs[0], followlinks=True):
 
     while True:
       size = len(dirnames)
