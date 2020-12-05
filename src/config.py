@@ -14,8 +14,17 @@ class Config:
     self.config = configparser.ConfigParser()
     self.config.read(path)
 
+  # returns first path
   def download_path(self):
-    return self.__get_value(CONFIG_SECTION_GENERAL, CONFIG_OPTION_DOWNLOAD_PATH)
+    paths = self.download_paths()
+    if isinstance(paths, list):
+      return paths[0]
+    else:
+      return paths
+
+  def download_paths(self):
+    paths = self.__get_value(CONFIG_SECTION_GENERAL, CONFIG_OPTION_DOWNLOAD_PATH)
+    return paths.split(',')
 
   def target_path(self):
     return self.__get_value(CONFIG_SECTION_GENERAL, CONFIG_OPTION_TARGET_PATH)

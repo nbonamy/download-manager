@@ -9,11 +9,13 @@ var vm = new Vue({
   router,
   data: {
     isLoading: false,
+    showFinalize: false,
+    showAdd: false,
     configErrors: null,
     downloads: null,
     history: null,
-    showFinalize: false,
     currentItem: null,
+    url: null,
     title: null,
     destinations: null,
     destination: null
@@ -80,24 +82,26 @@ var vm = new Vue({
       });
     },
     add() {
-      var self = this;
-      self.$buefy.dialog.prompt({
-        title: 'Paste the URL to download',
-        confirmText: 'Download',
-        type: 'is-success',
-        inputAttrs: {
-          placeholder: 'https://uptobox.com/',
-          length: 128
-        },
-        onConfirm: (value) => {
-          if (value.length > 0) {
-            this.download(value);
-          }
-        }
-      })
+      axios.get('/ws/downloads').then(response => {
+        vm.destinations = response.data.items
+        vm.destination = vm.destinations[0]
+      });
+      vm.showAdd = true;
+      this.$nextTick(() => {
+        console.log(this.$refs);
+        this.$refs.url.focus();
+      });
     },
-    download(url) {
-      axios.get('/ws/download?url=' + url).then(response => {
+    doAdd() {
+      var self = this;
+      if (vm.url.length > 0) {
+        vm.showAdd = false
+        this.download(vm.url, vm.destination);
+        vm.url = null;
+      }
+    },
+    download(url, dest) {
+      axios.get('/ws/download?url=' + url + '&dest=' + dest).then(response => {
         vm.refreshStatus();
       }).catch(function (error) {
         self.$buefy.dialog.alert({
@@ -131,7 +135,7 @@ var vm = new Vue({
           title: 'Confirm download',
           message: '<p>Do you really want to download <b>' + response.data.title + '</b>?</p><p class="is-italic is-size-7"><br/>' + response.data.info.filename + '</p>',
           onConfirm: () => {
-            self.download(q.url);
+            self.download(q.url, '');
           }
         });
       }).finally(function (error) {

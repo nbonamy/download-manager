@@ -19,6 +19,7 @@ class BaseModel(Model):
 class Download(BaseModel):
   url = CharField()
   download_url = CharField()
+  filepath = CharField()
   filename = CharField()
   filesize = IntegerField(default=0)
   started_at = DateTimeField(default=datetime.datetime.now)

@@ -18,7 +18,7 @@ class Downloader:
   def __init__(self, config):
     self.config = config
 
-  def get_download_info(self, url):
+  def get_download_info(self, url, dest=None):
 
     # try to get more info
     if self.config.is_testing():
@@ -61,6 +61,7 @@ class Downloader:
     download = Download()
     download.url = url
     download.download_url = final_url
+    download.filepath = dest or self.config.download_path()
     download.filename = filename
     download.filesize = filesize
 
@@ -75,9 +76,9 @@ class Downloader:
     # do it
     try:
       if self.config.is_testing():
-        p = subprocess.Popen(['wget', '-q', dld.download_url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
+        p = subprocess.Popen(['wget', '-q', dld.download_url, '&'], cwd=dld.filepath, preexec_fn=os.setsid)
       else:
-        p = subprocess.Popen(['plowdown', '-q', '-o', self.config.download_path(), dld.url, '&'], cwd=self.config.download_path(), preexec_fn=os.setsid)
+        p = subprocess.Popen(['plowdown', '-q', '-o', dld.filepath, dld.url, '&'], cwd=dld.filepath, preexec_fn=os.setsid)
       dld.pid = p.pid
       dld.status = consts.STATUS_STARTING
       dld.started_at = datetime.datetime.now()
@@ -204,7 +205,7 @@ class Downloader:
     return True
 
   def __get_fullpath(self, dld):
-    return self.config.download_path() + '/' + dld.filename
+    return dld.filepath + '/' + dld.filename
 
   def __cleanup(self, dld):
 

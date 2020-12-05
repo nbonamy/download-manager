@@ -128,6 +128,32 @@
 		</section>
 		<template>
 			<section>
+				<b-modal :active.sync="showAdd" has-modal-card>
+					<div class="modal-card" style="width: auto; min-width: 400px; max-width: 800px;">
+						<header class="modal-card-head">
+							<p class="modal-card-title has-text-weight-semibold">Add download</p>
+						</header>
+						<section class="modal-card-body">
+							<b-field label="URL">
+								<b-input type="text" v-model="url" ref="url" placeholder="Download URL" required>
+								</b-input>
+							</b-field>
+							<b-field label="Download folder" v-if="destinations != null && destinations.length > 1">
+								<b-select placeholder="Select a download folder" v-model="destination" :expanded="true" required>
+									<option v-for="dest in destinations" :value="dest" :key="dest">
+										{{ dest }}
+									</option>
+								</b-select>
+							</b-field>
+						</section>
+						<footer class="modal-card-foot" style="justify-content: flex-end;">
+							<button class="button" type="button" @click="showAdd=false; url=null;">Cancel</button>
+							<button class="button is-primary" @click="doAdd">Add</button>
+						</footer>
+					</div>
+				</b-modal>
+			</section>
+			<section>
 				<b-modal :active.sync="showFinalize" has-modal-card>
 					<div class="modal-card" style="width: auto; min-width: 400px; max-width: 800px;">
 						<header class="modal-card-head">

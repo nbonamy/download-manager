@@ -82,7 +82,7 @@ def download():
 
   # try to get more info
   downloader = Downloader(app.config.config)
-  download = downloader.get_download_info(url)
+  download = downloader.get_download_info(url, request.args.get('dest'))
   if download is None:
     abort(500)
 
@@ -129,6 +129,10 @@ def title(id):
     abort(404)
 
   return jsonify({'title': utils.extractTitle(download.filename)})
+
+@app.route('/ws/downloads')
+def downloads():
+  return jsonify({'items': app.config.config.download_paths()})
 
 @app.route('/ws/destinations')
 def destinations():
