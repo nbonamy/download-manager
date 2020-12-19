@@ -84,7 +84,7 @@ var vm = new Vue({
     add() {
       axios.get('/ws/downloads').then(response => {
         vm.destinations = response.data.items
-        vm.destination = vm.destinations[0]
+        vm.destination = vm.destinations[0].path
       });
       vm.showAdd = true;
       this.$nextTick(() => {

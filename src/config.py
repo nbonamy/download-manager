@@ -17,14 +17,19 @@ class Config:
   # returns first path
   def download_path(self):
     paths = self.download_paths()
-    if isinstance(paths, list):
-      return paths[0]
-    else:
-      return paths
+    return paths[0]["path"]
 
   def download_paths(self):
+    res = []
     paths = self.__get_value(CONFIG_SECTION_GENERAL, CONFIG_OPTION_DOWNLOAD_PATH)
-    return paths.split(',')
+    paths = paths.split(';')
+    for p in paths:
+      path = dict()
+      p = p.split(':')
+      path["label"] = p[0]
+      path["path"] = p[1 if len(p) == 2 else 0]
+      res.append(path)
+    return res
 
   def target_path(self):
     return self.__get_value(CONFIG_SECTION_GENERAL, CONFIG_OPTION_TARGET_PATH)

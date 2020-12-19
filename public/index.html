@@ -140,8 +140,8 @@
 							</b-field>
 							<b-field label="Download folder" v-if="destinations != null && destinations.length > 1">
 								<b-select placeholder="Select a download folder" v-model="destination" :expanded="true" required>
-									<option v-for="dest in destinations" :value="dest" :key="dest">
-										{{ dest }}
+									<option v-for="dest in destinations" :value="dest.path" :key="dest.path">
+										{{ dest.label }}
 									</option>
 								</b-select>
 							</b-field>
