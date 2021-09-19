@@ -1,9 +1,6 @@
-import re
 import utils
 import consts
 import os.path
-import subprocess
-import urllib.parse
 from config import Config
 from downloader import Downloader
 from playhouse.shortcuts import model_to_dict
