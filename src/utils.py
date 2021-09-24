@@ -40,9 +40,9 @@ def extractTitle(filename):
       else:
         lastDate = i
     if part in [ 'multi', 'vo', 'vf', 'vost', 'vostfr', 'french', 'truefrench' ]:
-      lastLang = i
+      lastLang = min(lastLang, i)
     if part in [ 'sd', 'hd', 'hdlight', 'bluray', '720p', '1080p', '2160p', '4k' ]:
-      lastFormat = i
+      lastFormat = min(lastFormat, i)
 
   # first non title
   titleEnd = min(lastDate, lastLang, lastFormat)

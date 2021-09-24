@@ -33,6 +33,7 @@ filenames = {
   'Blade.Runner.2049.MULTI.1080p.mkv': 'Blade Runner 2049',
   'Blade.Runner.2049.1080p.mkv': 'Blade Runner 2049',
   'Blade.Runner.2049.2017.MULTI.1080p.mkv': 'Blade Runner 2049',
+  'Foundation.S01E01.4K.MULTI.2160p.HDR.WEB.H265-EXTREME.mkv': 'Foundation S01E01',
   'C\'est.comme.ça.2018.FRENCH.720p.mkv': 'C\'est comme ça',
   'L\'élève.Ducobu.TRUEFRENCH.720p.mkv': 'L\'élève Ducobu',
 }
