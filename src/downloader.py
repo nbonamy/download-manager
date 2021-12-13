@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import subprocess
 import pycurl
 import psutil
@@ -22,8 +23,9 @@ class Downloader:
 
     # try to get more info
     if self.config.is_testing():
-      final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M2$M1$C1870$34874/01%20Hooked%20On%20A%20Feeling.mp3'
-      final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M3$Z0$33607/L%27Empereur%20de%20Paris.mkv'
+      #final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M2$M1$C1870$34874/01%20Hooked%20On%20A%20Feeling.mp3'
+      #final_url = 'http://192.168.1.2:5000/download/file/2c87720d-5393-124d-a6bf-e78ccd4843f7/default/M3$Z0$33607/L%27Empereur%20de%20Paris.mkv'
+      final_url = 'https://mediastation.bonamy.fr/download/atmos1.mkv?id=M3$Z0$65611$74648&download=1'
       filename = urllib.parse.unquote(os.path.basename(final_url))
       filesize = 0
     else:
@@ -84,6 +86,7 @@ class Downloader:
       dld.pid = p.pid
       dld.status = consts.STATUS_STARTING
       dld.started_at = datetime.datetime.now()
+      dld.progress = json.dumps({'elapsed': 0, 'size': 0})
       dld.save()
       return True
     except Exception as ex:
@@ -146,16 +149,37 @@ class Downloader:
             # calculate download speed
             if elapsed > 0:
 
-              speed = currsize / elapsed
-              status['speed'] = utils.humansize(speed) + '/s'
+              # get previous statuses
+              statuses = []
+              if not dld.progress is None:
+                statuses = json.loads(dld.progress)
 
-              # calculate left
-              if dld.filesize > 0:
-                left_bytes = dld.filesize - currsize;
-                left_seconds = left_bytes / speed
-                delta = datetime.timedelta(0, left_seconds)
-                status['time_left'] = str(delta).split('.')[0]
-                status['eta'] = '{0:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now() + delta)
+              # remove old statuses and add latest
+              statuses = list(filter(lambda x: elapsed - x['elapsed'] > 0 and elapsed - x['elapsed'] <= consts.SPEED_CALC_TIME_RANGE, statuses))
+              statuses.append({
+                'elapsed': elapsed,
+                'size': currsize,
+              })
+
+              # now take oldest one and calc speed
+              oldest = statuses[0]
+              if elapsed != oldest['elapsed']:
+
+                # calculate speed                
+                speed = (currsize - oldest['size']) / (elapsed - oldest['elapsed'])
+                status['speed'] = utils.humansize(speed) + '/s'
+
+                # calculate left
+                if dld.filesize > 0 and speed > 0:
+                  left_bytes = dld.filesize - currsize;
+                  left_seconds = left_bytes / speed
+                  delta = datetime.timedelta(0, left_seconds)
+                  status['time_left'] = str(delta).split('.')[0]
+                  status['eta'] = '{0:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now() + delta)
+
+              # save statuses
+              dld.progress = json.dumps(statuses)
+              dld.save()
 
           except Exception as ex:
             print('Reporting error during download', dld.filename, ex)
