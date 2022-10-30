@@ -5,6 +5,7 @@ import subprocess
 import pycurl
 import psutil
 import consts
+import shutil
 import datetime
 import urllib.parse
 import utils
@@ -208,16 +209,12 @@ class Downloader:
 
   def finalize(self, dld, dest, title):
 
-    try:
-      fullsrc = self.__get_fullpath(dld)
-      fulldst = dest + '/' + title + utils.extension(dld.filename)
-      os.rename(fullsrc, fulldst)
-      dld.status = consts.STATUS_PROCESSED
-      dld.save()
-      return True
-    except Exception as ex:
-      print(ex)
-      return False
+    fullsrc = self.__get_fullpath(dld)
+    fulldst = dest + '/' + title + utils.extension(dld.filename)
+    #shutil.move(fullsrc, fulldst)
+    os.system(f'mv "{fullsrc}" "{fulldst}"')
+    dld.status = consts.STATUS_PROCESSED
+    dld.save()
 
   def cancel(self, dld):
 
