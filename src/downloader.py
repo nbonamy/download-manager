@@ -1,11 +1,11 @@
 import os
 import re
+import sys
 import json
 import subprocess
 import pycurl
 import psutil
 import consts
-import shutil
 import datetime
 import urllib.parse
 import utils
@@ -209,10 +209,17 @@ class Downloader:
 
   def finalize(self, dld, dest, title):
 
+    # check for bind mount
+    if sys.platform == 'linux':
+      osstream = os.popen('grep -e "^.* $(realpath ' + dest + ')" /etc/fstab | grep bind | cut -d " " -f 1')
+      target = osstream.read().strip()
+      if target != '':
+        dest = target
+
+    # now simply rename
     fullsrc = self.__get_fullpath(dld)
     fulldst = dest + '/' + title + utils.extension(dld.filename)
-    #shutil.move(fullsrc, fulldst)
-    os.system(f'mv "{fullsrc}" "{fulldst}"')
+    os.rename(fullsrc, fulldst)
     dld.status = consts.STATUS_PROCESSED
     dld.save()
 
