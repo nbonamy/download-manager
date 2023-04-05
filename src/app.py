@@ -171,11 +171,13 @@ def finalize(id):
   except:
     abort(404)
 
-  downloader = Downloader(app.config.config)
-  if downloader.finalize(download, dest, title):
+
+  try:
+    downloader = Downloader(app.config.config)
+    downloader.finalize(download, dest, title)
     return jsonify({'status': 'ok'})
-  else:
-    abort(500)
+  except Exception as ex:
+    abort(500, ex)
 
 @app.route('/ws/cancel/<id>')
 def cancel(id):

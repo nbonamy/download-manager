@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import json
 import subprocess
 import pycurl
@@ -86,7 +87,7 @@ class Downloader:
       dld.pid = p.pid
       dld.status = consts.STATUS_STARTING
       dld.started_at = datetime.datetime.now()
-      dld.progress = json.dumps({'elapsed': 0, 'size': 0})
+      dld.progress = json.dumps([{'elapsed': 0, 'size': 0}])
       dld.save()
       return True
     except Exception as ex:
@@ -184,6 +185,7 @@ class Downloader:
           except Exception as ex:
             print('Reporting error during download', dld.filename, ex)
             status['status'] = 'error'
+            status['error'] = repr(ex)
 
       else:
         print('File does not exist during download', dld.filename)
@@ -207,16 +209,19 @@ class Downloader:
 
   def finalize(self, dld, dest, title):
 
-    try:
-      fullsrc = self.__get_fullpath(dld)
-      fulldst = dest + '/' + title + utils.extension(dld.filename)
-      os.rename(fullsrc, fulldst)
-      dld.status = consts.STATUS_PROCESSED
-      dld.save()
-      return True
-    except Exception as ex:
-      print(ex)
-      return False
+    # check for bind mount
+    if sys.platform == 'linux':
+      osstream = os.popen('grep -e "^.* $(realpath ' + dest + ')" /etc/fstab | grep bind | cut -d " " -f 1')
+      target = osstream.read().strip()
+      if target != '':
+        dest = target
+
+    # now simply rename
+    fullsrc = self.__get_fullpath(dld)
+    fulldst = dest + '/' + title + utils.extension(dld.filename)
+    os.rename(fullsrc, fulldst)
+    dld.status = consts.STATUS_PROCESSED
+    dld.save()
 
   def cancel(self, dld):
 
