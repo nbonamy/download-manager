@@ -81,7 +81,7 @@ def download():
   downloader = Downloader(app.config.config)
   download = downloader.get_download_info(url, request.args.get('dest'))
   if download is None:
-    abort(500)
+    abort(404)
 
   # now run download process
   if downloader.download(download) is False:

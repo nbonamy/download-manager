@@ -30,6 +30,11 @@ class Downloader:
       filename = urllib.parse.unquote(os.path.basename(final_url))
       filesize = 0
     else:
+
+      # uptobox.eu -> uptobox.com
+      url = url.replace('uptobox.eu', 'uptobox.com')
+
+      # now run plowdown
       result = subprocess.run(['plowdown -q --skip-final --printf %d ' + url], shell=True, stdout=subprocess.PIPE, universal_newlines=True)
       if result.returncode != 0 or len(result.stdout) == 0:
         return None
