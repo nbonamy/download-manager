@@ -77,3 +77,4 @@ venv.bak/
 data/
 config/
 *.log
+.DS_Store
