@@ -88,12 +88,11 @@ var vm = new Vue({
       });
       vm.showAdd = true;
       this.$nextTick(() => {
-        console.log(this.$refs);
+        //console.log(this.$refs);
         this.$refs.url.focus();
       });
     },
     doAdd() {
-      var self = this;
       if (vm.url.length > 0) {
         vm.showAdd = false
         this.download(vm.url, vm.destination);
