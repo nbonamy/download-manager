@@ -10,7 +10,7 @@ Restart=always
 RestartSec=5
 User=mnmt
 WorkingDirectory=/home/mnmt/src/downtobox/src
-ExecStart=/usr/local/bin/flask run --reload --host=0.0.0.0 --port=5555
+ExecStart=/usr/bin/python3 app.py
 
 [Install]
 WantedBy=multi-user.target

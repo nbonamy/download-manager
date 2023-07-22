@@ -104,7 +104,7 @@ class Downloader:
     # default
     status = {
       'id': dld.id,
-      'info': model_to_dict(dld),
+      'info': model_to_dict(dld, exclude=[Download.started_at]),
       'status': 'created',
       'progress': 0,
       'speed': '',
