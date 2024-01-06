@@ -103,7 +103,7 @@ var vm = new Vue({
       }
     },
     download(url, dest) {
-      axios.get('/ws/download?url=' + url + '&dest=' + dest).then(response => {
+      axios.get('/ws/download?url=' + encodeURIComponent(url) + '&dest=' + dest).then(response => {
         vm.refreshStatus();
       }).catch(function (error) {
         self.$buefy.dialog.alert({
@@ -132,7 +132,7 @@ var vm = new Vue({
     q = this.$route.query;
     if (q.url != null) {
       this.isLoading = true;
-      axios.get('/ws/info?url=' + q.url).then(response => {
+      axios.get('/ws/info?url=' + encodeURIComponent(q.url)).then(response => {
         this.$buefy.dialog.confirm({
           title: 'Confirm download',
           message: '<p>Do you really want to download <b>' + response.data.title + '</b>?</p><p class="is-italic is-size-7"><br/>' + response.data.info.filename + '</p>',
