@@ -228,6 +228,10 @@ class Downloader:
       if target != '':
         dest = target
 
+    # create target folder
+    if not os.path.exists(dest):
+      os.makedirs(dest)
+
     # now simply rename
     fullsrc = self.__get_fullpath(dld)
     fulldst = dest + '/' + title + utils.extension(dld.filename)

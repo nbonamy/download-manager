@@ -18,6 +18,7 @@ var vm = new Vue({
     url: null,
     title: null,
     destinations: null,
+    subfolder: null,
     destination: null
   },
   methods: {
@@ -63,6 +64,7 @@ var vm = new Vue({
       axios.get('/ws/destinations').then(response => {
         vm.destinations = response.data.items
         vm.destination = vm.destinations[0]
+        vm.subfolder = ''
       });
       vm.currentItem = item;
       vm.showFinalize = true;
@@ -71,6 +73,7 @@ var vm = new Vue({
       url = '/ws/finalize/' + vm.currentItem.id;
       url += '?title=' + encodeURIComponent(vm.title);
       url += '&dest=' + encodeURIComponent(vm.destination)
+      url += '&subfolder=' + encodeURIComponent(vm.subfolder)
       axios.get(url).then(response => {
         vm.showFinalize = false;
         vm.refresh();

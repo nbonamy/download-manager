@@ -171,6 +171,10 @@
 									</option>
 								</b-select>
 							</b-field>
+							<b-field label="Create a folder inside destination folder">
+								<b-input type="text" v-model="subfolder" placeholder="Optional">
+								</b-input>
+							</b-field>
 						</section>
 						<footer class="modal-card-foot" style="justify-content: flex-end;">
 							<button class="button" type="button" @click="showFinalize=false">Cancel</button>

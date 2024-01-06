@@ -165,6 +165,7 @@ def finalize(id):
 
   # check destination
   dest = request.query.dest
+  subfolder = request.query.subfolder
   if dest is None or len(dest) < 1:
     abort(400)
 
@@ -176,7 +177,7 @@ def finalize(id):
 
   try:
     downloader = Downloader(app.config.get('config'))
-    downloader.finalize(download, dest, title)
+    downloader.finalize(download, os.path.join(dest, subfolder), title)
     return {'status': 'ok'}
   except Exception as ex:
     abort(500, ex)
