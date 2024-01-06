@@ -271,5 +271,5 @@ class Downloader:
       except:
         print('Could not delete files')
     else:
-        print('No file to cleanup: ', fullpath)
+      print('No file to cleanup: ', fullpath)
 
