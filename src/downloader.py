@@ -59,11 +59,19 @@ class Downloader:
       c.setopt(c.HEADERFUNCTION, headers.write)
       c.perform()
 
-      # now try to get filesize
+      # get headers
       headers = headers.getvalue().decode('utf-8')
+
+      # if we have a content-disposition header, use it
+      matches = re.findall(r'Content-Disposition: attachment; filename="(.*)"', headers, re.MULTILINE)
+      if matches is not None and len(matches) > 0:
+        filename = matches[0]
+
+      # now try to get filesize
       matches = re.findall(r'Content-Length: ([0-9]*)\r', headers, re.MULTILINE)
       if matches is not None and len(matches) > 0:
         filesize = int(matches[0])
+
     except:
       print('Error while getting filesize')
 
