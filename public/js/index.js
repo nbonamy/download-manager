@@ -21,6 +21,34 @@ var vm = new Vue({
     subfolder: null,
     destination: null
   },
+  beforeMount() {
+    axios.get('/ws/check').then(response => {
+      if (response.data.status == 'ok') {
+        this.refresh();
+        setInterval(() => this.refreshStatus(), 1000);
+      } else {
+        vm.configErrors = response.data.errors;
+      }
+    })
+  },
+  mounted: function() {
+    var self = this;
+    q = this.$route.query;
+    if (q.url != null) {
+      this.isLoading = true;
+      axios.get('/ws/info?url=' + encodeURIComponent(q.url)).then(response => {
+        this.$buefy.dialog.confirm({
+          title: 'Confirm download',
+          message: '<p>Do you really want to download <b>' + response.data.title + '</b>?</p><p class="is-italic is-size-7"><br/>' + response.data.info.filename + '</p>',
+          onConfirm: () => {
+            self.download(q.url, '');
+          }
+        });
+      }).finally(function (error) {
+        self.isLoading = false;
+      });
+    }
+  },
   methods: {
     refresh() {
       this.refreshStatus();
@@ -115,34 +143,10 @@ var vm = new Vue({
           iconPack: 'mdi'
         })
       });
+    },
+    humanFileSize(size) {
+      var i = size == 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+      return (size / Math.pow(1024, i)).toFixed(1) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
     }
   },
-  beforeMount() {
-    axios.get('/ws/check').then(response => {
-      if (response.data.status == 'ok') {
-        this.refresh();
-        setInterval(() => this.refreshStatus(), 1000);
-      } else {
-        vm.configErrors = response.data.errors;
-      }
-    })
-  },
-  mounted: function() {
-    var self = this;
-    q = this.$route.query;
-    if (q.url != null) {
-      this.isLoading = true;
-      axios.get('/ws/info?url=' + encodeURIComponent(q.url)).then(response => {
-        this.$buefy.dialog.confirm({
-          title: 'Confirm download',
-          message: '<p>Do you really want to download <b>' + response.data.title + '</b>?</p><p class="is-italic is-size-7"><br/>' + response.data.info.filename + '</p>',
-          onConfirm: () => {
-            self.download(q.url, '');
-          }
-        });
-      }).finally(function (error) {
-        self.isLoading = false;
-      });
-    }
-  }
 })

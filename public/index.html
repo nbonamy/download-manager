@@ -54,6 +54,7 @@
 					<thead>
 						<th>URL</th>
 						<th>Filename</th>
+						<th>Size</th>
 						<th>Status</th>
 						<th>Speed</th>
 						<th>Time&nbsp;Left</th>
@@ -63,6 +64,7 @@
 						<tr v-for="item in downloads">
 							<td>{{ item.info.url }}</td>
 							<td class="long-text">{{ item.info.filename }}</td>
+							<td class="tabular-number">{{ humanFileSize(item.info.filesize) }}</td>
 							<td>
 								<span v-if="item.status == 'downloading'" class="tabular-number">{{ item.progress }}%</span>
 								<span v-else>{{ item.status }}</span>
