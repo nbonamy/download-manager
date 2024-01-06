@@ -10,8 +10,7 @@ import datetime
 import urllib.parse
 import utils
 from io import BytesIO
-from model import database, Download
-from playhouse.shortcuts import model_to_dict
+from model import Download
 
 class Downloader:
 
@@ -112,7 +111,7 @@ class Downloader:
     # default
     status = {
       'id': dld.id,
-      'info': model_to_dict(dld, exclude=[Download.started_at]),
+      'info': dld.to_dict(),
       'status': 'created',
       'progress': 0,
       'speed': '',

@@ -3,6 +3,7 @@ import consts
 import datetime
 from peewee import *
 from playhouse.migrate import *
+from playhouse.shortcuts import model_to_dict
 
 database = SqliteDatabase(consts.DATABASE_PATH, pragmas={
   'journal_mode': 'wal'
@@ -43,3 +44,6 @@ class Download(BaseModel):
   status = IntegerField(default=consts.STATUS_CREATED)
   progress = CharField(null=True, max_length=8192)
   pid = IntegerField(default=0)
+
+  def to_dict(self):
+    return model_to_dict(self, exclude=[Download.started_at])

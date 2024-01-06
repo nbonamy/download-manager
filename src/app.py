@@ -5,7 +5,6 @@ import consts
 import os.path
 from config import Config
 from downloader import Downloader
-from playhouse.shortcuts import model_to_dict
 from bottle import Bottle, request, abort
 from model import create_database, Download
 
@@ -67,7 +66,7 @@ def info():
 
   # done
   return {
-    'info': model_to_dict(download),
+    'info': download.to_dict(),
     'title': utils.extractTitle(download.filename)
   }
 
@@ -91,7 +90,7 @@ def download():
     abort(500)
 
   # done
-  return model_to_dict(download)
+  return download.to_dict()
 
 @app.route('/ws/start/<id>')
 def start(id):
@@ -107,7 +106,7 @@ def start(id):
     abort(500)
 
   # done
-  return model_to_dict(download)
+  return download.to_dict()
 
 @app.route('/ws/status/<id>')
 def status_one(id):
