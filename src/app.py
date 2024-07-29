@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from gevent import monkey; monkey.patch_all()
+
 import utils
 import consts
 import os.path
@@ -202,4 +204,4 @@ def purge(id):
   return {'status': 'ok'}
 
 # run server
-app.run(host='0.0.0.0', port=5555, debug=True)
+app.run(host='0.0.0.0', port=5555, debug=True, server='gevent')
