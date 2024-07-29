@@ -223,10 +223,8 @@ class Downloader:
 
     # check for bind mount
     if sys.platform == 'linux':
-      osstream = os.popen('grep -e "^.* $(realpath ' + dest + ')" /etc/fstab | grep bind | cut -d " " -f 1')
-      target = osstream.read().strip()
-      if target != '':
-        dest = target
+      dest = self._realpath(dest)
+      dest = self._parse_fstab_binds(dest)
 
     # create target folder
     if not os.path.exists(dest):
@@ -277,3 +275,39 @@ class Downloader:
     else:
       print('No file to cleanup: ', fullpath)
 
+  def _realpath(self, path):
+    return os.path.realpath(path)
+
+  def _parse_fstab_binds(self, path):
+
+    # first load binds
+    binds = []
+    with open('/etc/fstab', 'r') as f:
+      lines = f.readlines()
+      for line in lines:
+        if line.startswith('#'):
+          continue
+        fields = re.split('[ \t]+', line)
+        if len(fields) < 4:
+          continue
+        type = fields[3]
+        if not 'bind' in type.split(','):
+          continue
+        binds.append(fields)
+
+    # now find longest match
+    longest_match = []
+    longest_match_length = 0
+    for bind in binds:
+      dst=bind[1]
+      if path.startswith(dst) and len(dst) > longest_match_length:
+        longest_match_length = len(dst)
+        longest_match = bind
+
+    # not found?
+    if longest_match_length == 0:
+      return path
+  
+    # replace
+    path = path.replace(longest_match[1], longest_match[0])
+    return path
